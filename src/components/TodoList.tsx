@@ -1,4 +1,4 @@
-import React from "react";
+import React, { SetStateAction, useEffect } from "react";
 import { Todo } from "../models/models";
 import SingleTodo from "./SingleTodo";
 import { Droppable } from "react-beautiful-dnd";
@@ -22,6 +22,44 @@ const TodoList: React.FC<TodoListProps> = ({
   Done,
   setDone,
 }) => {
+  
+  useEffect(() => {
+    // Load tasks from local storage on component mount
+    const storedTodos = localStorage.getItem("todos");
+    if (storedTodos) {
+      setTodos(JSON.parse(storedTodos));
+    }
+
+    const storedDoing = localStorage.getItem("doing");
+    if (storedDoing) {
+      setDoing(JSON.parse(storedDoing));
+    }
+
+    const storedDone = localStorage.getItem("done");
+    if (storedDone) {
+      setDone(JSON.parse(storedDone));
+    }
+  }, [setDoing, setDone, setTodos]); // Empty dependency array ensures this effect runs only once on mount
+
+  useEffect(() => {
+    // Save tasks to local storage whenever tasks are updated
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
+
+  useEffect(() => {
+    // Save doing tasks to local storage whenever doing tasks are updated
+    localStorage.setItem("doing", JSON.stringify(Doing));
+  }, [Doing]);
+
+  useEffect(() => {
+    // Save done tasks to local storage whenever done tasks are updated
+    localStorage.setItem("done", JSON.stringify(Done));
+  }, [Done]);
+
+  function handleUpdateTodos(value: SetStateAction<Todo[]>): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <div className="container">
       <Droppable droppableId="TodosList">
@@ -38,9 +76,9 @@ const TodoList: React.FC<TodoListProps> = ({
                 todos={todos}
                 todo={todo}
                 key={todo.id}
-                setTodos={setTodos}
+                setTodos={handleUpdateTodos}
                 doing={Doing}
-                setDoing={setDoing}
+                setDoing={handleUpdateTodos}
               />
             ))}
             {provided.placeholder}
@@ -61,9 +99,9 @@ const TodoList: React.FC<TodoListProps> = ({
                 todos={Doing}
                 todo={todo}
                 key={todo.id}
-                setTodos={setDoing}
+                setTodos={handleUpdateTodos}
                 doing={Doing}
-                setDoing={setDoing}
+                setDoing={handleUpdateTodos}
               />
             ))}
             {provided.placeholder}
@@ -86,9 +124,9 @@ const TodoList: React.FC<TodoListProps> = ({
                 todos={Done}
                 todo={todo}
                 key={todo.id}
-                setTodos={setDone}
+                setTodos={handleUpdateTodos}
                 doing={Doing}
-                setDoing={setDoing}
+                setDoing={handleUpdateTodos}
               />
             ))}
             {provided.placeholder}
